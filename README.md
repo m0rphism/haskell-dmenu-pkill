@@ -6,7 +6,7 @@ dmenu script for killing applications. Can be sorted by process id or CPU/Memory
 Runtime Dependencies:
 [dmenu](http://tools.suckless.org/dmenu/) or
 [dmenu2](https://bitbucket.org/melek/dmenu2), and
-the linux tools `ps` and `kill`.
+the standard linux tools `ps` and `kill`.
 
 Installation:
   Either get the sources from this repository, or
