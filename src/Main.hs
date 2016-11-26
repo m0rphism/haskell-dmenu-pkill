@@ -93,14 +93,15 @@ readArgs
 readArgs args =
   execStateT (go $ words $ unwords args) PID
  where
-  go []           = pure ()
+  go []                          = pure ()
   go (a:as)
-    | a == "--"   = pure () -- All arguments after "--" are passed to dmenu later.
-    | a == "-cpu" = do put CPU; go as
-    | a == "-mem" = do put MEM; go as
-    | a == "-pid" = do put PID; go as
-    | a == ""     = go as
-  go _            = liftIO $ do putStrLn usage; exitFailure
+    | a == "--"                  = pure () -- All arguments after "--" are passed to dmenu later.
+    | a == "-cpu"                = do put CPU; go as
+    | a == "-mem"                = do put MEM; go as
+    | a == "-pid"                = do put PID; go as
+    | a `elem` ["-h", "--help"]  = liftIO $ do putStrLn usage; exitFailure
+    | a == ""                    = go as
+  go _                           = liftIO $ do putStrLn usage; exitFailure
 
 main :: IO ()
 main = do
@@ -128,7 +129,12 @@ usage = unlines
   , "All arguments, after the first `--` argument, are directly passed to dmenu."
   , ""
   , "Options:"
-  , "  -cpu    sort process list by CPU usage."
-  , "  -mem    sort process list by memory usage."
-  , "  -pid    sort process list by pid. (default)"
+  , "  -cpu"
+  , "    Sort process list by CPU usage."
+  , "  -mem"
+  , "    Sort process list by memory usage."
+  , "  -pid"
+  , "    Sort process list by pid. (default)"
+  , "  -h, --help"
+  , "    Display this message."
   ]
