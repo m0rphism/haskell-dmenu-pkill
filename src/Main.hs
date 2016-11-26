@@ -1,8 +1,10 @@
-{-# LANGUAGE UnicodeSyntax, LambdaCase #-}
+{-# LANGUAGE UnicodeSyntax, LambdaCase, FlexibleContexts #-}
 
 import Control.Monad
 import Control.Monad.IO.Class
+import Control.Monad.State.Strict
 import Control.Lens
+import Data.List (isPrefixOf)
 import System.Environment
 import System.Exit
 import System.Process
@@ -82,24 +84,43 @@ fillWithSPR ss = map f ss where
   f s = replicate (maxLength - length s) ' ' ++ s
   maxLength = maximum (map length ss)
 
+data ProcessOrder = CPU | MEM | PID
+
+-- | Parse the command line arguments
+readArgs
+  :: [String] -- ^ Arguments from 'getArgs'
+  -> IO ProcessOrder
+readArgs args =
+  execStateT (go $ words $ unwords args) PID
+ where
+  go []           = pure ()
+  go (a:as)
+    | a == "--"   = pure () -- All arguments after "--" are passed to dmenu later.
+    | a == "-cpu" = do put CPU; go as
+    | a == "-mem" = do put MEM; go as
+    | a == "-pid" = do put PID; go as
+    | a == ""     = go as
+  go _            = liftIO $ do putStrLn usage; exitFailure
+
 main :: IO ()
 main = do
-  args ← getArgs
-  sortProcs ← case args of
-    ["-cpu"] → pure $ reverse . sortWith piCpuUsage
-    ["-mem"] → pure $ reverse . sortWith piMemoryUsage
-    ["-pid"] → pure id
-    []       → pure id
-    _        → putStrLn usage >> exitFailure
+  order ← readArgs =<< getArgs
+  sortProcs ← case order of
+    CPU → pure $ reverse . sortWith piCpuUsage
+    MEM → pure $ reverse . sortWith piMemoryUsage
+    PID → pure id
   procs ← sortProcs <$> getProcs
-  let procs' = zip (map piPid procs) (showProcInfos procs)
-  DMenu.selectWith (DMenu.prompt .= "kill -9") snd procs' >>= \case
+  let procItems = zip (map piPid procs) (showProcInfos procs)
+  let cfg = do
+        DMenu.prompt .= "kill -9"
+        DMenu.forwardExtraArgs
+  DMenu.selectWith cfg snd procItems >>= \case
     Right (pid,_) → callCommand $ "kill -9 " ++ show pid
     _             → pure ()
 
 usage :: String
 usage = unlines
-  [ "Usage: dmenu-pkill [OPTIONS] [-- DMENUOPTIONS"
+  [ "Usage: dmenu-pkill [OPTIONS] [-- DMENUOPTIONS]"
   , ""
   , "Get current processes with `ps aux`, optionally sort them by CPU or RAM"
   , "usage, and ask via dmenu to kill one of the processes via `kill -9 <pid>`."
