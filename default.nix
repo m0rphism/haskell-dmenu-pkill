@@ -11,6 +11,6 @@ mkDerivation {
     base containers directory dmenu lens mtl process transformers
   ];
   homepage = "https://github.com/m0rphism/haskell-dmenu-pkill";
-  description = "dmenu script for killing applications. Can be sorted by process id or CPU/Memory usage.";
+  description = "dmenu script for killing applications. Sortable by process id or CPU/MEM usage.";
   license = stdenv.lib.licenses.bsd3;
 }
