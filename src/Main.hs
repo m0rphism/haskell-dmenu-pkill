@@ -121,14 +121,15 @@ main = do
 
 usage :: String
 usage = unlines
-  [ "Usage: dmenu-pkill [OPTIONS] [-- DMENUOPTIONS]"
+  [ "USAGE"
+  , "  dmenu-pkill [OPTIONS] [-- DMENUOPTIONS]"
   , ""
-  , "Get current processes with `ps aux`, optionally sort them by CPU or RAM"
-  , "usage, and ask via dmenu to kill one of the processes via `kill -9 <pid>`."
+  , "  Get current processes with `ps aux`, optionally sort them by CPU or RAM"
+  , "  usage, and ask via dmenu to kill one of the processes via `kill -9 <pid>`."
   , ""
-  , "All arguments, after the first `--` argument, are directly passed to dmenu."
+  , "  All arguments, after the first `--` argument, are directly passed to dmenu."
   , ""
-  , "Options:"
+  , "OPTIONS"
   , "  -cpu"
   , "    Sort process list by CPU usage."
   , "  -mem"
