@@ -14,9 +14,11 @@ Installation:
 
 Usage:
 
-*   `dmenu-pkill [OPTIONS]`
+*   `dmenu-pkill [OPTIONS] [-- DMENUOPTIONS]`
 
     Spawns a dmenu process to let the user select processes to kill with `kill -9`.
+    
+    All arguments, after the first `--` argument, are directly passed to `dmenu`.
 
 Options:
 
