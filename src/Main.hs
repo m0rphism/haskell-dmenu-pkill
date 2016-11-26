@@ -61,7 +61,8 @@ showProcInfos pis = map f pairs
   mems  = fillWithSPR $ map (show . piMemoryUsage) pis
   cmds  = fillWithSP $ map piCommand pis
   pairs = zip users $ zip pids $ zip cpus $ zip mems cmds
-  f (user,(pid,(cpu,(mem,cmd)))) = concat $ intersperse "  " [ pid, user, cpu ++ "% CPU", mem ++ "% MEM", cmd ]
+  f (user,(pid,(cpu,(mem,cmd)))) =
+    concat $ intersperse "  " [ pid, user, cpu ++ "% CPU", mem ++ "% MEM", cmd ]
 
 getProcs :: MonadIO m => m [ProcInfo]
 getProcs = do
@@ -98,13 +99,15 @@ main = do
 
 usage :: String
 usage = unlines
-  [ "Usage: dmenu-pkill [OPTIONS]"
+  [ "Usage: dmenu-pkill [OPTIONS] [-- DMENUOPTIONS"
   , ""
   , "Get current processes with `ps aux`, optionally sort them by CPU or RAM"
   , "usage, and ask via dmenu to kill one of the processes via `kill -9 <pid>`."
   , ""
+  , "All arguments, after the first `--` argument, are directly passed to dmenu."
+  , ""
   , "Options:"
-  , "  -cpu: sort process list by CPU usage."
-  , "  -mem: sort process list by memory usage."
-  , "  -pid: sort process list by pid. (default)"
+  , "  -cpu    sort process list by CPU usage."
+  , "  -mem    sort process list by memory usage."
+  , "  -pid    sort process list by pid. (default)"
   ]
